@@ -3,6 +3,9 @@ package net.poweredbyawesome.snowbars;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -95,6 +98,7 @@ public class Snowbar {
                     currentBlock.setData((byte) (currentBlock.getData()+1));
                     baseHeight++;
                 }
+                moveEntities();
             } else {
                 if (currentBlock.getData() == 0) {
                     baseHeight--;
@@ -115,4 +119,11 @@ public class Snowbar {
         this.taskId = taskId;
     }
 
+    public void moveEntities() {
+        for (Entity e : currentBlock.getLocation().getChunk().getEntities()) {
+            if (e.getLocation().distance(currentBlock.getLocation()) < 1) {
+                e.setVelocity(e.getVelocity().add(new Vector(0.0, 0.1, 0.0)));
+            }
+        }
+    }
 }
