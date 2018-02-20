@@ -1,0 +1,4 @@
+name: Snowbars
+version: ${project.version}
+main: net.poweredbyawesome.snowbars.Snowbars
+authors: [LaxWasHere]
