@@ -1,6 +1,7 @@
 package net.poweredbyawesome.snowbars;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -15,15 +16,15 @@ public class Snowbar {
     private Block currentBlock;
     private int maxHeight; // Amount in blocks.
     private int baseHeight = 0;
-    private int speed = 5;
     private int taskId;
     private boolean up = true;
+    private boolean isRandom;
 
-    public Snowbar(Block block, int maxHeight, int speed) {
+    public Snowbar(Block block, int maxHeight, boolean isRandom) {
         this.base = block;
         this.currentBlock = block;
         this.maxHeight = maxHeight;
-        this.speed = speed;
+        this.isRandom = isRandom;
     }
 
     public Block getBase() {
@@ -36,6 +37,38 @@ public class Snowbar {
 
     public void setMaxHeight(int maxHeight) {
         this.maxHeight = maxHeight;
+    }
+
+    public int getBaseHeight() {
+        return baseHeight;
+    }
+
+    private int getMaxH() {
+        return maxHeight * 7;
+    }
+
+    public void destroy() {
+        Bukkit.getScheduler().cancelTask(taskId);
+    }
+
+    public int getTaskId() {
+        return taskId;
+    }
+
+    private void setTaskId(int taskId) {
+        this.taskId = taskId;
+    }
+
+    public boolean getIsRandom() {
+        return isRandom;
+    }
+
+    public void setIsRandom(Boolean bool) {
+        this.isRandom = bool;
+    }
+
+    private int getThreadRandom() {
+        return ThreadLocalRandom.current().nextInt(maxHeight * 7);
     }
 
     private Block upBlock() {
@@ -55,34 +88,14 @@ public class Snowbar {
             currentBlock.setData((byte) 7);
             return currentBlock;
         }
-        baseHeight = getRandom();
+        if (isRandom) {
+            baseHeight = getThreadRandom();
+        }
         up = true;
         return base;
     }
 
-    public int getBaseHeight() {
-        return baseHeight;
-    }
 
-    private int getMaxH() {
-        return maxHeight * 7;
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    private int getRandom() {
-        return ThreadLocalRandom.current().nextInt(maxHeight * 7);
-    }
-
-    public void destroy() {
-        Bukkit.getScheduler().cancelTask(taskId);
-    }
 
     public void visualize() {
         base.setType(Material.SNOW);
@@ -108,22 +121,23 @@ public class Snowbar {
                     currentBlock.setData((byte) (currentBlock.getData()-1));
                 }
             }
-        }, 0, speed));
-    }
-
-    public int getTaskId() {
-        return taskId;
-    }
-
-    private void setTaskId(int taskId) {
-        this.taskId = taskId;
+        }, 0, 1));
     }
 
     public void moveEntities() {
         for (Entity e : currentBlock.getLocation().getChunk().getEntities()) {
-            if (e.getLocation().distance(currentBlock.getLocation()) < 1) {
+            if (e.getLocation().distance(currentBlock.getLocation()) < 1.5) {
                 e.setVelocity(e.getVelocity().add(new Vector(0.0, 0.1, 0.0)));
             }
         }
     }
+
+    public boolean isSnowbar(Location loc) {
+        if (getBase().getX() == loc.getX() && getBase().getZ() == loc.getZ()) {
+            int why = loc.getBlockY();
+            return  (why >= getBase().getY() && why <= (getBase().getY()+maxHeight));
+        }
+        return false;
+    }
+
 }
