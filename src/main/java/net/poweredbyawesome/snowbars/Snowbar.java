@@ -4,13 +4,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Snowbar {
+public class Snowbar implements ConfigurationSerializable {
 
     private Block base;
     private Block currentBlock;
@@ -25,6 +28,27 @@ public class Snowbar {
         this.currentBlock = block;
         this.maxHeight = maxHeight;
         this.isRandom = isRandom;
+    }
+
+    public Map<String, Object> serialize() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("base", base.getLocation());
+        map.put("currentBlock", currentBlock.getLocation());
+        map.put("maxHeight", maxHeight);
+        map.put("baseHeight", baseHeight);
+        map.put("up", up);
+        map.put("isRandom", isRandom);
+        return map;
+    }
+
+    public Snowbar(Map<String, Object> map)
+    {
+        this.base = ((Location)map.get("base")).getBlock();
+        this.currentBlock = ((Location)map.get("currentBlock")).getBlock();
+        this.maxHeight = (int)map.get("maxHeight");
+        this.baseHeight = (int)map.get("baseHeight");
+        this.up = (boolean)map.get("up");
+        visualize();
     }
 
     public Block getBase() {
@@ -126,7 +150,7 @@ public class Snowbar {
 
     public void moveEntities() {
         for (Entity e : currentBlock.getLocation().getChunk().getEntities()) {
-            if (e.getLocation().distance(currentBlock.getLocation()) < 1.5) {
+            if (e.getLocation().distanceSquared(currentBlock.getLocation()) < 2.25) {
                 e.setVelocity(e.getVelocity().add(new Vector(0.0, 0.1, 0.0)));
             }
         }
@@ -139,5 +163,4 @@ public class Snowbar {
         }
         return false;
     }
-
 }

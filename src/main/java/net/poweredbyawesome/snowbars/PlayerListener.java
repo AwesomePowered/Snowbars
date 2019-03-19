@@ -35,6 +35,7 @@ public class PlayerListener implements Listener {
             snowbar.setIsRandom((ev.getPlayer().isSneaking()));
             snowbar.visualize();
             plugin.bars.add(snowbar);
+            plugin.saveSnowbars();
             plugin.dejays.put(p.getUniqueId(), snowbar);
             sendMessage(ev.getPlayer(), "&7[Snowbars] &aYou have created a snowbar.");
             plugin.debug("Interact","visualized a snowbar");
@@ -51,6 +52,7 @@ public class PlayerListener implements Listener {
                 plugin.dejays.put(p.getUniqueId(), null);
                 snowbar.destroy();
                 plugin.bars.remove(snowbar);
+                plugin.saveSnowbars();
                 sendMessage(p, "&7[Snowbars] &cThe snowbar is no longer playing");
                 return;
             }
