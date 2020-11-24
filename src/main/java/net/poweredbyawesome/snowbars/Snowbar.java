@@ -1,5 +1,6 @@
 package net.poweredbyawesome.snowbars;
 
+import net.poweredbyawesome.snowbars.event.SnowbarSnowEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -124,6 +125,12 @@ public class Snowbar implements ConfigurationSerializable {
     public void visualize() {
         base.setType(Material.SNOW);
         setTaskId(Bukkit.getScheduler().scheduleSyncRepeatingTask(Snowbars.intance, () -> {
+            SnowbarSnowEvent snowbarSnowEvent = new SnowbarSnowEvent(this);
+            Bukkit.getServer().getPluginManager().callEvent(snowbarSnowEvent);
+            if (snowbarSnowEvent.isCancelled()) {
+                return;
+            }
+
             if (getBaseHeight() >= getMaxH()) {
                 up = false;
             }
